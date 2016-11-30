@@ -1,0 +1,67 @@
+---
+title: "Phylo"
+author: "Elyas Heidary-93100796"
+date: "November 29, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+library(ape)
+library(seqinr)
+
+
+all_gossypium_arboreum <- c("U56806", "U12712", "U56810", "U12732", "U12725", "U56786",
+"U12715","AF057758", "U56790", "U12716", "U12729", "U56798",
+"U12727", "U12713", "U12719", "U56811", "U12728", "U12730",
+"U12731", "U12722", "U56796", "U12714", "U56789", "U56797",
+"U56801", "U56802", "U12718", "U12710", "U56804", "U12734",
+"U56809", "U56812", "AF057753", "U12711", "U12717", "U12723",
+"U12726")
+
+all_gossypium_arboreum <- read.GenBank(all_gossypium_arboreum)
+GenBank_IDs <- paste(attr(all_gossypium_arboreum, "species"), names(all_gossypium_arboreum), sep ="_RAG1_")
+#write.dna(all_gossypium_arboreum, file ="gossypium_arboreum.fasta", format = "fasta", append = FALSE )
+write.fasta(sequences = all_gossypium_arboreum, names = GenBank_IDs,nbchar = 100, file.out ="gossypium_arboreum.fasta")
+
+
+
+```
+
+```{r}
+library(msa)
+#myseqs <- read.alignment("gossypium_arboreum.fasta", format = "fasta")
+#mySequences <- readAAStringSet("gossypium_arboreum.fasta")
+
+
+align <- msa("gossypium_arboreum.fasta" , type = "dna")
+# msaPrettyPrint(align, output="pdf", showNames="none",showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
+myAlignment <- msaConvert(align, type="seqinr::alignment")
+d <- dist.alignment(myAlignment, "identity")
+# colnames(d) <- GenBank_IDs
+mat <- as.matrix(d)
+# beep <- dna.alignment()
+mytree <- nj(mat)
+# read.tree(mytree)
+plot(mytree , main="Phylogenetic Tree of Hemoglobin Alpha Sequences")
+#tiplabels(GenBank_IDs, adj = c(1.2, 1), frame = "n", cex = 0.8, font = 3,)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
